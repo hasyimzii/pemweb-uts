@@ -44,8 +44,15 @@
                 // check username availability
                 $check = mysqli_query($conn, "SELECT * FROM user_details WHERE username='$username'");
 
+                if($username == $user['username']) {
+                    // query update
+                    $query = mysqli_query($conn, "UPDATE user_details SET username='$username',first_name='$firstname',last_name='$lastname', gender='$gender' WHERE user_id=$id");
+                
+                    // change alert
+                    $alert = "success";
+                }
                 // if exist
-                if(mysqli_num_rows($check) != 0) {
+                elseif(mysqli_num_rows($check) != 0) {
                     $alert = "failed";
                     $erroruser = "*Username is already taken!";
                 }
