@@ -4,6 +4,7 @@
 
     // alert
     $alert = null;
+    $erroruser = $errorfirst = $errorlast = null;
 
     // create db
     if(isset($_POST['create'])) {
@@ -12,11 +13,45 @@
         $lastname = $_POST['lastname'];
         $gender = $_POST['gender'];
 
-        // query create
-        $query = mysqli_query($conn, "INSERT INTO user_details(username, first_name, last_name, gender) VALUES('$username', '$firstname', '$lastname', '$gender')");
+        // validation
+        if(empty($username)) {
+            $alert = "failed";
+            $erroruser = "*Username is required!";
+        }
+        if(empty($firstname)) {
+            $alert = "failed";
+            $errorfirst = "*Firstname is required!";
+        }
+        if(empty($lastname)) {
+            $alert = "failed";
+            $errorlast = "*Lastname is required!";
+        }
+        // if not empty
+        if(!empty($username) && !empty($firstname) && !empty($lastname)) {
+            // regex username
+            if(preg_match('/^\w{5,}$/', $username)) {
+                // check username availability
+                $check = mysqli_query($conn, "SELECT * FROM user_details WHERE username='$username'");
 
-        // change alert
-        $alert = "success";
+                // if exist
+                if(mysqli_num_rows($check) != 0) {
+                    $alert = "failed";
+                    $erroruser = "*Username is already taken!";
+                }
+                // if available
+                else {
+                    // query create
+                    $query = mysqli_query($conn, "INSERT INTO user_details(username, first_name, last_name, gender) VALUES('$username', '$firstname', '$lastname', '$gender')");
+
+                    // change alert
+                    $alert = "success";
+                }
+            }
+            else {
+                $alert = "failed";
+                $erroruser = "*Username not valid!";
+            }
+        }
     }
 ?>
 <?=template_header('Create Account')?>
@@ -39,15 +74,19 @@
                 <div class="form-group">
                     <label for="">Username</label>
                     <input type="text" class="form-control" name="username" placeholder="Username">
+                    <small class="form-text text-muted">Must longer than 5 characters. Can contain letter, number, or underscore. Make sure username is available!</small>
+                    <small class="form-text text-danger"><?= $erroruser; ?></small>
                 </div>
                 <div class="form-row mb-3">
                     <div class="col">
                         <label for="">First Name</label>
                         <input type="text" class="form-control" name="firstname" placeholder="First name">
+                    <small class="form-text text-danger"><?= $errorfirst; ?></small>
                     </div>
                     <div class="col">
                         <label for="">Last Name</label>
                         <input type="text" class="form-control" name="lastname" placeholder="Last name">
+                        <small class="form-text text-danger"><?= $errorlast; ?></small>
                     </div>
                 </div>
                 <div class="form-group mb-4">
