@@ -1,9 +1,9 @@
 <?php
 // connection database
-$databaseHost = 'localhost';
-$databaseName = 'pemweb_uts';
-$databaseUsername = 'root';
-$databasePassword = '';
+$databaseHost = '127.0.0.1';
+$databaseName = 'uts192410101047';
+$databaseUsername = '192410101047';
+$databasePassword = 'secret';
 
 $conn = mysqli_connect($databaseHost, $databaseUsername, $databasePassword, $databaseName);
 
