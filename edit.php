@@ -2,12 +2,33 @@
     // include main config & template
     include '_main.php';
 
-    // // connect db
-    // $pdo = pdo_connect_mysql();
-    // // Get the page via GET request (URL param: page), if non exists default the page to 1
-    // $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-    // // Number of records to show on each page
-    // $records_per_page = 5;
+    // edit page
+    // get decrypted id
+    $id = decrypt($_GET['id']);
+    // query fetch by id
+    $query = mysqli_query($conn, "SELECT * FROM user_details WHERE user_id=$id");
+    // fetch as associative
+    $user = mysqli_fetch_assoc($query);
+
+    // alert
+    $alert = null;
+
+    // update db
+    if(isset($_POST['update'])) {
+        // get decrypted id
+        $id = decrypt($_POST['id']);
+
+        $username = $_POST['username'];
+        $firstname = $_POST['firstname'];
+        $lastname = $_POST['lastname'];
+        $gender = $_POST['gender'];
+
+        // query update
+        $query = mysqli_query($conn, "UPDATE user_details SET username='$username',first_name='$firstname',last_name='$lastname', gender='$gender' WHERE user_id=$id");
+	
+        // change alert
+        $alert = "success";
+    }
 ?>
 <?=template_header('Edit Account')?>
     <div class="container">
@@ -18,28 +39,37 @@
 
         <div class="row p-5 shadow p-3 mb-5 bg-white rounded">
             <form action="" method="post" class="col-12">
+                <!-- alert -->
+                <?php if($alert == "success"): ?>
+                    <div class="alert alert-success" role="alert">User Updated Successfully!  <a href="index.php">Show Result</a></div>
+                <?php elseif($alert == "failed"): ?>
+                    <div class="alert alert-danger" role="alert">Failed to Update User!</div>
+                <?php endif; ?>
+
+                <!-- form -->
+                <input type="hidden" name="id" value=<?= encrypt($id);?>>
                 <div class="form-group">
                     <label for="">Username</label>
-                    <input type="text" class="form-control" name="username" placeholder="Username">
+                    <input type="text" class="form-control" name="username" value="<?= $user['username']; ?>">
                 </div>
                 <div class="form-row mb-3">
                     <div class="col">
                         <label for="">First Name</label>
-                        <input type="text" class="form-control" name="firstname" placeholder="First name">
+                        <input type="text" class="form-control" name="firstname" value="<?= $user['first_name']; ?>">
                     </div>
                     <div class="col">
                         <label for="">Last Name</label>
-                        <input type="text" class="form-control" name="lastname" placeholder="Last name">
+                        <input type="text" class="form-control" name="lastname" value="<?= $user['last_name']; ?>">
                     </div>
                 </div>
                 <div class="form-group mb-4">
                     <label for="">Gender</label>
                     <select class="form-control" name="gender">
-                        <option selected>Male</option>
-                        <option>Female</option>
+                        <option <?= $user['gender']=="Male" ? 'selected' : ''; ?>>Male</option>
+                        <option <?= $user['gender']=="Female" ? 'selected' : ''; ?>>Female</option>
                     </select>
                 </div>
-                <button type="submit" name="submit" class="btn btn-warning btn-block shadow bg-warning text-white">Edit</button>
+                <button type="submit" name="update" class="btn btn-warning btn-block shadow bg-warning text-white">Update</button>
             </form>
         </div>
     </div>

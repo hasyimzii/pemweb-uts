@@ -12,12 +12,12 @@
     $next = $page + 1;
 
     // connect & query read db
-    $results = mysqli_query($conn, "SELECT * FROM user_details ORDER BY user_id DESC");
-    $total_result = mysqli_num_rows($results);
+    $query = mysqli_query($conn, "SELECT * FROM user_details ORDER BY user_id DESC");
+    $total_result = mysqli_num_rows($query);
     $total_page = ceil($total_result / $limit);
 
-    // limit query
-    $result = mysqli_query($conn,"SELECT * FROM user_details ORDER BY user_id DESC LIMIT $first_page, $limit");
+    // limited query
+    $limited = mysqli_query($conn,"SELECT * FROM user_details ORDER BY user_id DESC LIMIT $first_page, $limit");
 
 ?>
 <?=template_header('Account List')?>
@@ -43,8 +43,9 @@
                 </thead>
                 <tbody>
                     <?php
+                        // fetch as array
                         $n = $first_page + 1;
-                        while($user = mysqli_fetch_array($result)) {
+                        while($user = mysqli_fetch_array($limited)):
                     ?>
                     <tr class="p-3">
                         <th scope="row" class="align-middle"><?= $n++; ?></th>
@@ -55,10 +56,10 @@
                         <td class="align-middle">
                         <div class="btn-group" role="group">
                             <a href="edit.php?id=<?= encrypt($user['user_id']); ?>"><button type="button" class="btn btn-warning shadow bg-warning text-white rounded-0"><i class="fas fa-pen fa-sm"></i></button></a>
-                            <a href="delete.php?id=$user[user_id]"><button type="button" class="btn btn-danger shadow bg-danger text-white rounded-0"><i class="fas fa-trash fa-sm"></i></button></a>
+                            <a href="delete.php?id=<?= encrypt($user['user_id']); ?>"><button type="button" class="btn btn-danger shadow bg-danger text-white rounded-0"><i class="fas fa-trash fa-sm"></i></button></a>
                         </td>
                     </tr>
-                    <?php } ?>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
 
